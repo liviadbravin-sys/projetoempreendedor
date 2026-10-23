@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinEdu | Controle Financeiro</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header>
+    <a class="logo" href="#">FinEdu</a>
+    <nav>
+      <a href="#painel">Painel</a>
+      <a href="#movimentacoes">Movimentações</a>
+      <a href="#metas">Metas</a>
+    </nav>
+    <button id="tema" class="botao-tema">🌙</button>
+  </header>
+
+  <main class="container">
+    <section class="apresentacao" id="painel">
+      <p class="etiqueta">EDUCAÇÃO FINANCEIRA</p>
+      <h1>Seu dinheiro, <span>suas escolhas.</span></h1>
+      <p>Organize suas finanças e transforme seus planos em objetivos.</p>
+    </section>
+
+    <section class="resumos">
+      <article class="cartao">
+        <p>Saldo disponível</p>
+        <h2 id="saldo">R$ 0,00</h2>
+      </article>
+      <article class="cartao">
+        <p>Receitas</p>
+        <h2 id="receitas" class="verde">R$ 0,00</h2>
+      </article>
+      <article class="cartao">
+        <p>Despesas</p>
+        <h2 id="despesas" class="vermelho">R$ 0,00</h2>
+      </article>
+    </section>
+
+    <section class="layout">
+      <article class="cartao" id="movimentacoes">
+        <h2>Movimentações</h2>
+        <p class="descricao">Registre suas entradas e despesas.</p>
+
+        <form id="formMovimentacao">
+          <label for="descricao">Descrição</label>
+          <input id="descricao" type="text" placeholder="Ex.: lanche, mesada..." required>
+
+          <label for="valor">Valor (R$)</label>
+          <input id="valor" type="number" min="0.01" step="0.01" placeholder="0,00" required>
+
+          <label for="tipo">Tipo de movimentação</label>
+          <select id="tipo">
+            <option value="despesa">Despesa</option>
+            <option value="receita">Receita</option>
+          </select>
+
+          <label for="categoria">Categoria</label>
+          <select id="categoria">
+            <option>Alimentação</option>
+            <option>Transporte</option>
+            <option>Estudos</option>
+            <option>Lazer</option>
+            <option>Casa</option>
+            <option>Mesada</option>
+            <option>Outros</option>
+          </select>
+
+          <button class="botao principal" type="submit">+ Adicionar movimentação</button>
+        </form>
+
+        <div class="titulo-lista">
+          <h3>Histórico</h3>
+          <button id="exportar" class="botao secundario" type="button">Exportar CSV</button>
+        </div>
+        <div id="listaMovimentacoes">
+          <p class="vazio">Suas movimentações aparecerão aqui.</p>
+        </div>
+      </article>
+
+      <div class="coluna-lateral">
+        <article class="cartao">
+          <h2>Limite de gastos</h2>
+          <p class="descricao">Defina seu orçamento mensal.</p>
+          <form id="formOrcamento">
+            <label for="orcamento">Orçamento (R$)</label>
+            <input id="orcamento" type="number" min="0.01" step="0.01" placeholder="Ex.: 500" required>
+            <button class="botao principal" type="submit">Definir limite</button>
+          </form>
+          <div class="barra"><div id="progresso"></div></div>
+          <p id="mensagemOrcamento" class="descricao">Defina seu limite para começar.</p>
+        </article>
+
+        <article class="cartao">
+          <h2>Regra 50–30–20</h2>
+          <p class="descricao">Uma forma simples de planejar sua renda.</p>
+          <label for="renda">Renda mensal (R$)</label>
+          <input id="renda" type="number" min="0" step="0.01" placeholder="Ex.: 1200">
+          <button id="calcular" class="botao secundario" type="button">Calcular divisão</button>
+          <div class="regra"><span>Necessidades · 50%</span><strong id="necessidades">R$ 0,00</strong></div>
+          <div class="regra"><span>Desejos · 30%</span><strong id="desejos">R$ 0,00</strong></div>
+          <div class="regra"><span>Economia · 20%</span><strong id="economia">R$ 0,00</strong></div>
+        </article>
+
+        <article class="cartao" id="metas">
+          <h2>Minha meta</h2>
+          <p class="descricao">Planeje sua próxima conquista.</p>
+          <form id="formMeta">
+            <label for="nomeMeta">Nome da meta</label>
+            <input id="nomeMeta" type="text" placeholder="Ex.: comprar um livro" required>
+            <label for="valorMeta">Valor desejado (R$)</label>
+            <input id="valorMeta" type="number" min="0.01" step="0.01" required>
+            <label for="guardado">Quanto já guardou (R$)</label>
+            <input id="guardado" type="number" min="0" step="0.01" value="0" required>
+            <button class="botao principal" type="submit">Criar meta</button>
+          </form>
+          <div id="listaMetas"></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="dica">
+      <span>💡</span>
+      <div>
+        <strong>Uma dica do FinEdu</strong>
+        <p>Registrar até os pequenos gastos ajuda você a entender seus hábitos e tomar decisões melhores.</p>
+      </div>
+    </section>
+
+    <p class="aviso">FinEdu é um projeto educativo demonstrativo. Não está conectado a bancos. Os dados ficam salvos no navegador utilizado.</p>
+  </main>
+
+  <footer>© 2026 FinEdu · Educação financeira de um jeito simples.</footer>
+</body>
+</html>

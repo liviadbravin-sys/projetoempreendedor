@@ -1,336 +1,535 @@
-
 const $ = (id) => document.getElementById(id);
+const STORAGE = "finedu_dashboard_v2";
 
-const moeda = (valor) =>
-  Number(valor || 0).toLocaleString("pt-BR", {
+const money = value =>
+  new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL"
-  });
+  }).format(Number(value) || 0);
 
-let movimentacoes = [];
-let metas = [];
-let orcamento = 0;
+const defaultState = {
+  transactions: [],
+  budget: 0,
+  goals: [],
+  monthlyIncome: 0,
+  dark: false,
+  challenge: []
+};
 
-try {
-  movimentacoes = JSON.parse(localStorage.getItem("finedu_movimentacoes")) || [];
-  metas = JSON.parse(localStorage.getItem("finedu_metas")) || [];
-  orcamento = Number(localStorage.getItem("finedu_orcamento")) || 0;
+let state = loadState();
 
-  document.body.classList.toggle(
-    "escuro",
-    localStorage.getItem("finedu_tema") === "escuro"
-  );
-} catch (erro) {
-  console.log("Não foi possível carregar os dados salvos.");
-}
-
-function salvarDados() {
-  localStorage.setItem("finedu_movimentacoes", JSON.stringify(movimentacoes));
-  localStorage.setItem("finedu_metas", JSON.stringify(metas));
-  localStorage.setItem("finedu_orcamento", String(orcamento));
-}
-
-function totais() {
-  const receitas = movimentacoes
-    .filter((item) => item.tipo === "receita")
-    .reduce((soma, item) => soma + item.valor, 0);
-
-  const despesas = movimentacoes
-    .filter((item) => item.tipo === "despesa")
-    .reduce((soma, item) => soma + item.valor, 0);
-
-  return { receitas, despesas, saldo: receitas - despesas };
-}
-
-function atualizarResumo() {
-  const dados = totais();
-
-  $("saldo").textContent = moeda(dados.saldo);
-  $("receitas").textContent = moeda(dados.receitas);
-  $("despesas").textContent = moeda(dados.despesas);
-
-  atualizarOrcamento();
-}
-
-function atualizarMovimentacoes() {
-  const lista = $("listaMovimentacoes");
-
-  if (movimentacoes.length === 0) {
-    lista.innerHTML =
-      '<p class="vazio">Suas movimentações aparecerão aqui.</p>';
-    return;
-  }
-
-  lista.innerHTML = [...movimentacoes].reverse().map((item) => `
-    <div class="movimento">
-      <div class="movimento-info">
-        <strong>${escapar(item.descricao)}</strong>
-        <small>${escapar(item.categoria)} · ${escapar(item.data)}</small>
-      </div>
-      <span class="valor-movimento ${item.tipo === "receita" ? "verde" : "vermelho"}">
-        ${item.tipo === "receita" ? "+" : "−"} ${moeda(item.valor)}
-      </span>
-      <button class="excluir" data-excluir="${item.id}" aria-label="Excluir movimentação">×</button>
-    </div>
-  `).join("");
-}
-
-function atualizarOrcamento() {
-  const despesas = totais().despesas;
-  const porcentagem = orcamento > 0
-    ? Math.round((despesas / orcamento) * 100)
-    : 0;
-
-  $("orcamento").value = orcamento || "";
-  $("progresso").style.width = Math.min(porcentagem, 100) + "%";
-
-  if (porcentagem >= 100) {
-    $("progresso").style.background = "var(--vermelho)";
-  } else if (porcentagem >= 80) {
-    $("progresso").style.background = "#e5a33d";
-  } else {
-    $("progresso").style.background = "var(--verde)";
-  }
-
-  if (orcamento === 0) {
-    $("mensagemOrcamento").textContent =
-      "Defina seu limite para começar.";
-  } else if (despesas > orcamento) {
-    $("mensagemOrcamento").textContent =
-      `Você ultrapassou seu limite em ${moeda(despesas - orcamento)}.`;
-  } else {
-    $("mensagemOrcamento").textContent =
-      `${porcentagem}% utilizado. Restam ${moeda(orcamento - despesas)}.`;
+function loadState() {
+  try {
+    return {
+      ...defaultState,
+      ...JSON.parse(localStorage.getItem(STORAGE) || "{}")
+    };
+  } catch {
+    return { ...defaultState };
   }
 }
 
-function atualizarMetas() {
-  const lista = $("listaMetas");
-
-  if (metas.length === 0) {
-    lista.innerHTML = '<p class="vazio">Suas metas aparecerão aqui.</p>';
-    return;
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE, JSON.stringify(state));
+  } catch {
+    toast("Não foi possível salvar os dados neste navegador.");
   }
-
-  lista.innerHTML = metas.map((meta) => {
-    const porcentagem = Math.min(
-      100,
-      Math.round((meta.guardado / meta.valor) * 100)
-    );
-
-    return `
-      <div class="meta">
-        <div class="meta-topo">
-          <span>${escapar(meta.nome)}</span>
-          <span>${porcentagem}%</span>
-        </div>
-        <div class="meta-barra">
-          <div class="meta-progresso" style="width: ${porcentagem}%"></div>
-        </div>
-        <div class="meta-rodape">
-          ${moeda(meta.guardado)} de ${moeda(meta.valor)}
-        </div>
-        ${
-          meta.guardado < meta.valor
-            ? `<form class="form-guardar" data-meta="${meta.id}">
-                <label>Adicionar valor (R$)</label>
-                <input type="number" name="valor" min="0.01" step="0.01" required placeholder="Ex.: 20">
-                <button class="botao secundario" type="submit">Guardar para a meta</button>
-              </form>`
-            : "<p class='verde'>🎉 Meta alcançada!</p>"
-        }
-        <button class="excluir" data-excluir-meta="${meta.id}">Excluir meta</button>
-      </div>
-    `;
-  }).join("");
 }
 
-function renderizar() {
-  atualizarResumo();
-  atualizarMovimentacoes();
-  atualizarMetas();
+function toast(message) {
+  const el = $("toast");
+  el.textContent = message;
+  el.classList.add("show");
+
+  clearTimeout(toast.timer);
+
+  toast.timer = setTimeout(() => {
+    el.classList.remove("show");
+  }, 2400);
 }
 
-function escapar(texto) {
-  return String(texto).replace(/[&<>"']/g, (caractere) => ({
+function safe(value) {
+  return String(value).replace(/[&<>"']/g, c => ({
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
     '"': "&quot;",
     "'": "&#39;"
-  })[caractere]);
+  }[c]));
 }
 
-$("formMovimentacao").addEventListener("submit", (evento) => {
-  evento.preventDefault();
+function totals() {
+  const income = state.transactions
+    .filter(t => t.type === "income")
+    .reduce((s, t) => s + t.amount, 0);
 
-  const descricao = $("descricao").value.trim();
-  const valor = Number($("valor").value);
+  const expenses = state.transactions
+    .filter(t => t.type === "expense")
+    .reduce((s, t) => s + t.amount, 0);
 
-  if (!descricao || !Number.isFinite(valor) || valor <= 0) {
-    alert("Confira a descrição e o valor.");
+  return {
+    income,
+    expenses,
+    balance: income - expenses
+  };
+}
+
+function renderSummary() {
+  const t = totals();
+
+  $("balanceValue").textContent = money(t.balance);
+  $("incomeValue").textContent = money(t.income);
+  $("expenseValue").textContent = money(t.expenses);
+
+  const completed = state.goals.filter(
+    g => g.saved >= g.target
+  ).length;
+
+  $("goalsValue").innerHTML =
+    `${completed} <small>/ ${state.goals.length}</small>`;
+}
+
+function renderTransactions() {
+  const list = $("transactionList");
+  const filter = $("filterType").value;
+
+  const items = [...state.transactions]
+    .reverse()
+    .filter(t => filter === "all" || t.type === filter)
+    .slice(0, 30);
+
+  if (!items.length) {
+    list.innerHTML =
+      '<p class="empty-state">Nenhuma movimentação encontrada.</p>';
     return;
   }
 
-  movimentacoes.push({
+  list.innerHTML = items.map(t => `
+    <div class="transaction-item">
+      <div class="transaction-symbol">
+        ${t.type === "income" ? "↗" : "↘"}
+      </div>
+
+      <div class="transaction-info">
+        <strong>${safe(t.description)}</strong>
+        <small>${safe(t.category)} · ${safe(t.date)}</small>
+      </div>
+
+      <span class="transaction-amount ${t.type}">
+        ${t.type === "income" ? "+" : "−"} ${money(t.amount)}
+      </span>
+
+      <button
+        class="delete-button"
+        type="button"
+        data-delete-transaction="${t.id}"
+        aria-label="Excluir movimentação"
+      >×</button>
+    </div>
+  `).join("");
+}
+
+function renderBudget() {
+  const spent = totals().expenses;
+  const limit = Number(state.budget) || 0;
+
+  const percent = limit > 0
+    ? Math.round(spent / limit * 100)
+    : 0;
+
+  $("budgetLimit").value = limit || "";
+  $("budgetSpent").textContent = `${money(spent)} gastos`;
+  $("budgetPercent").textContent = `${percent}%`;
+
+  const bar = $("budgetProgress");
+
+  bar.style.width = Math.min(percent, 100) + "%";
+
+  bar.className = "progress-fill" +
+    (percent >= 100 ? " over" :
+      percent >= 80 ? " warning" : "");
+
+  $("budgetMessage").textContent =
+    limit <= 0
+      ? "Defina um limite para acompanhar seu orçamento."
+      : percent > 100
+        ? `Você ultrapassou o limite em ${money(spent - limit)}.`
+        : percent >= 80
+          ? "Atenção: você está perto do limite definido."
+          : `Você ainda tem ${money(limit - spent)} disponíveis.`;
+}
+
+function renderGoals() {
+  const list = $("goalList");
+
+  if (!state.goals.length) {
+    list.innerHTML =
+      '<p class="empty-state">Sua próxima conquista começa com uma meta.</p>';
+    return;
+  }
+
+  list.innerHTML = state.goals.map(g => {
+    const percent = Math.min(
+      100,
+      Math.round(g.saved / g.target * 100)
+    );
+
+    const remaining = Math.max(0, g.target - g.saved);
+
+    return `
+      <div class="goal-item">
+        <div class="goal-title-row">
+          <span>${safe(g.name)}</span>
+          <small>${percent}%</small>
+        </div>
+
+        <div class="goal-track">
+          <div class="goal-progress" style="width:${percent}%"></div>
+        </div>
+
+        <div class="goal-bottom">
+          <span>${money(g.saved)} de ${money(g.target)}</span>
+          <button
+            class="delete-button"
+            type="button"
+            data-delete-goal="${g.id}"
+          >Excluir</button>
+        </div>
+
+        ${
+          remaining > 0
+            ? `
+              <form class="goal-add" data-add-goal="${g.id}">
+                <input
+                  name="amount"
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  placeholder="Valor para guardar"
+                  aria-label="Valor para adicionar"
+                  required
+                >
+                <button class="button button-light" type="submit">
+                  Guardar
+                </button>
+              </form>
+            `
+            : '<p class="budget-message">🎉 Meta alcançada! Parabéns!</p>'
+        }
+      </div>
+    `;
+  }).join("");
+}
+
+function renderRule() {
+  const income = Number(state.monthlyIncome) || 0;
+
+  $("monthlyIncome").value = income || "";
+  $("needsValue").textContent = money(income * 0.5);
+  $("wantsValue").textContent = money(income * 0.3);
+  $("savingsValue").textContent = money(income * 0.2);
+}
+
+const challengeTasks = [
+  "Anote todos os gastos de hoje",
+  "Revise suas assinaturas e compras recorrentes",
+  "Separe um valor, mesmo pequeno, para guardar",
+  "Pense antes de fazer uma compra por impulso",
+  "Confira seu limite de gastos",
+  "Defina uma meta financeira para o mês",
+  "Revise o que aprendeu nesta semana"
+];
+
+function renderChallenge() {
+  const checked = new Set(state.challenge);
+
+  $("challengeList").innerHTML = challengeTasks.map((task, i) => `
+    <label class="challenge-item ${checked.has(i) ? "done" : ""}">
+      <input
+        type="checkbox"
+        data-challenge="${i}"
+        ${checked.has(i) ? "checked" : ""}
+      >
+      <span>${task}</span>
+    </label>
+  `).join("");
+
+  const count = checked.size;
+  const percent = Math.round(count / 7 * 100);
+
+  $("challengeCount").textContent = `${count} de 7 concluídos`;
+  $("challengePercent").textContent = `${percent}%`;
+  $("challengeProgress").style.width = percent + "%";
+}
+
+function renderTheme() {
+  document.body.classList.toggle("dark", !!state.dark);
+  $("themeIcon").textContent = state.dark ? "☀" : "☾";
+}
+
+function render() {
+  renderSummary();
+  renderTransactions();
+  renderBudget();
+  renderGoals();
+  renderRule();
+  renderChallenge();
+  renderTheme();
+}
+
+// Adicionar movimentação
+$("transactionForm").addEventListener("submit", e => {
+  e.preventDefault();
+
+  const description = $("description").value.trim();
+  const amount = Number($("amount").value);
+
+  if (!description || !Number.isFinite(amount) || amount <= 0) {
+    toast("Confira a descrição e o valor.");
+    return;
+  }
+
+  state.transactions.push({
     id: Date.now(),
-    descricao,
-    valor,
-    tipo: $("tipo").value,
-    categoria: $("categoria").value,
-    data: new Date().toLocaleDateString("pt-BR")
+    description,
+    amount,
+    type: $("type").value,
+    category: $("category").value,
+    date: new Date().toLocaleDateString("pt-BR")
   });
 
-  salvarDados();
-  renderizar();
-  evento.target.reset();
+  saveState();
+  render();
+  e.target.reset();
+
+  toast("Movimentação adicionada!");
 });
 
-$("formOrcamento").addEventListener("submit", (evento) => {
-  evento.preventDefault();
+// Filtrar movimentações
+$("filterType").addEventListener("change", renderTransactions);
 
-  const valor = Number($("orcamento").value);
+// Excluir movimentação
+$("transactionList").addEventListener("click", e => {
+  const b = e.target.closest("[data-delete-transaction]");
 
-  if (!Number.isFinite(valor) || valor <= 0) {
-    alert("Digite um limite válido.");
+  if (!b) return;
+
+  state.transactions = state.transactions.filter(
+    t => String(t.id) !== b.dataset.deleteTransaction
+  );
+
+  saveState();
+  render();
+
+  toast("Movimentação excluída.");
+});
+
+// Salvar orçamento
+$("budgetForm").addEventListener("submit", e => {
+  e.preventDefault();
+
+  const value = Number($("budgetLimit").value);
+
+  if (!Number.isFinite(value) || value <= 0) {
+    toast("Informe um limite maior que zero.");
     return;
   }
 
-  orcamento = valor;
-  salvarDados();
-  atualizarOrcamento();
-  alert("Orçamento atualizado!");
+  state.budget = value;
+
+  saveState();
+  renderBudget();
+
+  toast("Orçamento atualizado!");
 });
 
-$("calcular").addEventListener("click", () => {
-  const renda = Number($("renda").value);
+// Calcular regra 50-30-20
+$("calculateRule").addEventListener("click", () => {
+  const input = $("monthlyIncome").value;
+  const value = Number(input);
 
-  if (!Number.isFinite(renda) || renda < 0 || $("renda").value === "") {
-    alert("Digite sua renda mensal.");
+  if (input === "" || !Number.isFinite(value) || value < 0) {
+    toast("Informe sua renda mensal.");
     return;
   }
 
-  $("necessidades").textContent = moeda(renda * 0.5);
-  $("desejos").textContent = moeda(renda * 0.3);
-  $("economia").textContent = moeda(renda * 0.2);
+  state.monthlyIncome = value;
+
+  saveState();
+  renderRule();
+
+  toast("Divisão calculada!");
 });
 
-$("formMeta").addEventListener("submit", (evento) => {
-  evento.preventDefault();
+// Criar meta
+$("goalForm").addEventListener("submit", e => {
+  e.preventDefault();
 
-  const nome = $("nomeMeta").value.trim();
-  const valor = Number($("valorMeta").value);
-  const guardado = Number($("guardado").value);
+  const name = $("goalName").value.trim();
+  const target = Number($("goalTarget").value);
+  const saved = Number($("goalSaved").value);
 
-  if (!nome || !Number.isFinite(valor) || valor <= 0 ||
-      !Number.isFinite(guardado) || guardado < 0) {
-    alert("Confira os dados da meta.");
+  if (
+    !name ||
+    !Number.isFinite(target) ||
+    target <= 0 ||
+    !Number.isFinite(saved) ||
+    saved < 0
+  ) {
+    toast("Confira os dados da meta.");
     return;
   }
 
-  metas.push({
+  state.goals.push({
     id: Date.now(),
-    nome,
-    valor,
-    guardado: Math.min(guardado, valor)
+    name,
+    target,
+    saved: Math.min(saved, target)
   });
 
-  salvarDados();
-  atualizarMetas();
-  evento.target.reset();
-  $("guardado").value = "0";
+  saveState();
+  render();
+
+  e.target.reset();
+  $("goalSaved").value = "0";
+
+  toast("Meta criada!");
 });
 
-$("listaMovimentacoes").addEventListener("click", (evento) => {
-  const botao = evento.target.closest("[data-excluir]");
-  if (!botao) return;
+// Adicionar dinheiro a uma meta
+$("goalList").addEventListener("submit", e => {
+  const form = e.target.closest("[data-add-goal]");
 
-  movimentacoes = movimentacoes.filter(
-    (item) => item.id !== Number(botao.dataset.excluir)
-  );
+  if (!form) return;
 
-  salvarDados();
-  renderizar();
-});
+  e.preventDefault();
 
-$("listaMetas").addEventListener("submit", (evento) => {
-  const formulario = evento.target.closest(".form-guardar");
-  if (!formulario) return;
+  const id = Number(form.dataset.addGoal);
+  const amount = Number(new FormData(form).get("amount"));
 
-  evento.preventDefault();
+  const goal = state.goals.find(g => g.id === id);
 
-  const id = Number(formulario.dataset.meta);
-  const valor = Number(new FormData(formulario).get("valor"));
-  const meta = metas.find((item) => item.id === id);
-
-  if (!meta || !Number.isFinite(valor) || valor <= 0) return;
-
-  meta.guardado = Math.min(meta.valor, meta.guardado + valor);
-  salvarDados();
-  atualizarMetas();
-});
-
-$("listaMetas").addEventListener("click", (evento) => {
-  const botao = evento.target.closest("[data-excluir-meta]");
-  if (!botao) return;
-
-  metas = metas.filter(
-    (meta) => meta.id !== Number(botao.dataset.excluirMeta)
-  );
-
-  salvarDados();
-  atualizarMetas();
-});
-
-$("tema").addEventListener("click", () => {
-  document.body.classList.toggle("escuro");
-
-  const temaAtual = document.body.classList.contains("escuro")
-    ? "escuro"
-    : "claro";
-
-  localStorage.setItem("finedu_tema", temaAtual);
-  $("tema").textContent = temaAtual === "escuro" ? "☀️" : "🌙";
-});
-
-$("exportar").addEventListener("click", () => {
-  if (movimentacoes.length === 0) {
-    alert("Adicione uma movimentação antes de exportar.");
+  if (!goal || !Number.isFinite(amount) || amount <= 0) {
+    toast("Informe um valor válido.");
     return;
   }
 
-  const linhas = [
-    ["Descrição", "Tipo", "Categoria", "Valor", "Data"],
-    ...movimentacoes.map((item) => [
-      item.descricao,
-      item.tipo,
-      item.categoria,
-      item.valor.toFixed(2).replace(".", ","),
-      item.data
+  goal.saved = Math.min(goal.target, goal.saved + amount);
+
+  saveState();
+  render();
+
+  toast("Valor adicionado à meta!");
+});
+
+// Excluir meta
+$("goalList").addEventListener("click", e => {
+  const b = e.target.closest("[data-delete-goal]");
+
+  if (!b) return;
+
+  state.goals = state.goals.filter(
+    g => String(g.id) !== b.dataset.deleteGoal
+  );
+
+  saveState();
+  render();
+
+  toast("Meta excluída.");
+});
+
+// Marcar tarefas do desafio
+$("challengeList").addEventListener("change", e => {
+  const box = e.target.closest("[data-challenge]");
+
+  if (!box) return;
+
+  const index = Number(box.dataset.challenge);
+  const set = new Set(state.challenge);
+
+  if (box.checked) {
+    set.add(index);
+  } else {
+    set.delete(index);
+  }
+
+  state.challenge = [...set].sort((a, b) => a - b);
+
+  saveState();
+  renderChallenge();
+
+  if (state.challenge.length === 7) {
+    toast("Parabéns! Você concluiu o desafio de 7 dias!");
+  }
+});
+
+// Reiniciar desafio
+$("resetChallenge").addEventListener("click", () => {
+  state.challenge = [];
+
+  saveState();
+  renderChallenge();
+
+  toast("Desafio reiniciado.");
+});
+
+// Alternar tema claro/escuro
+$("themeToggle").addEventListener("click", () => {
+  state.dark = !state.dark;
+
+  saveState();
+  renderTheme();
+});
+
+// Exportar movimentações para CSV
+$("exportButton").addEventListener("click", () => {
+  if (!state.transactions.length) {
+    toast("Adicione movimentações antes de exportar.");
+    return;
+  }
+
+  const rows = [
+    ["Descrição", "Tipo", "Categoria", "Valor (R$)", "Data"],
+    ...state.transactions.map(t => [
+      t.description,
+      t.type === "income" ? "Receita" : "Despesa",
+      t.category,
+      t.amount.toFixed(2).replace(".", ","),
+      t.date
     ])
   ];
 
-  const csv = "\uFEFF" + linhas
-    .map((linha) => linha.map((campo) =>
-      `"${String(campo).replace(/"/g, '""')}"`
-    ).join(";"))
+  const csv = "\uFEFF" + rows
+    .map(row =>
+      row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(";")
+    )
     .join("\r\n");
 
-  const arquivo = new Blob([csv], {
-    type: "text/csv;charset=utf-8;"
-  });
+  const url = URL.createObjectURL(
+    new Blob([csv], { type: "text/csv;charset=utf-8;" })
+  );
 
-  const link = document.createElement("a");
-  const url = URL.createObjectURL(arquivo);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "FinEdu-movimentacoes.csv";
 
-  link.href = url;
-  link.download = "FinEdu-movimentacoes.csv";
-  link.click();
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
 
   URL.revokeObjectURL(url);
+
+  toast("Arquivo CSV exportado!");
 });
 
-$("tema").textContent =
-  document.body.classList.contains("escuro") ? "☀️" : "🌙";
+// Data atual e ano no rodapé
+$("todayLabel").textContent =
+  new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "medium"
+  }).format(new Date());
 
-renderizar();
+$("year").textContent = new Date().getFullYear();
+
+// Inicializar site
+render();

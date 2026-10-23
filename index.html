@@ -1,139 +1,110 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FinEdu | Controle Financeiro</title>
+  <meta name="description" content="FinEdu: organize suas finanças, planeje gastos e acompanhe suas metas.">
+  <title>FinEdu — Controle financeiro inteligente</title>
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
 <body>
-  <header>
-    <a class="logo" href="#">FinEdu</a>
+  <aside class="sidebar">
+    <a class="brand" href="#inicio"><span class="brand-mark">F</span><span>FinEdu</span></a>
+    <p class="nav-label">MENU PRINCIPAL</p>
     <nav>
-      <a href="#painel">Painel</a>
-      <a href="#movimentacoes">Movimentações</a>
-      <a href="#metas">Metas</a>
+      <a class="nav-link active" href="#inicio"><span>▦</span> Visão geral</a>
+      <a class="nav-link" href="#movimentacoes"><span>↕</span> Movimentações</a>
+      <a class="nav-link" href="#orcamento"><span>◉</span> Orçamento</a>
+      <a class="nav-link" href="#metas"><span>◎</span> Minhas metas</a>
+      <a class="nav-link" href="#desafio"><span>✦</span> Desafio da semana</a>
     </nav>
-    <button id="tema" class="botao-tema">🌙</button>
-  </header>
+    <div class="sidebar-bottom">
+      <div class="help-card"><span class="help-icon">✦</span><strong>Um passo de cada vez</strong><p>Pequenos hábitos ajudam a construir uma vida financeira mais tranquila.</p></div>
+      <button id="themeToggle" class="theme-button" type="button"><span id="themeIcon">☾</span> Alternar tema</button>
+    </div>
+  </aside>
 
-  <main class="container">
-    <section class="apresentacao" id="painel">
-      <p class="etiqueta">EDUCAÇÃO FINANCEIRA</p>
-      <h1>Seu dinheiro, <span>suas escolhas.</span></h1>
-      <p>Organize suas finanças e transforme seus planos em objetivos.</p>
+  <main class="main" id="inicio">
+    <header class="topbar">
+      <div><p class="eyebrow">SEU ESPAÇO FINANCEIRO</p><h1>Visão geral</h1></div>
+      <div class="topbar-right"><span class="date-pill" id="todayLabel"></span><div class="avatar">F</div></div>
+    </header>
+
+    <section class="welcome-banner">
+      <div><p class="welcome-kicker">BEM-VINDA(O) AO FINEDU</p><h2>Organize hoje.<br><span>Realize amanhã.</span></h2><p>Acompanhe seu dinheiro e mantenha seus objetivos no caminho certo.</p><a href="#movimentacoes" class="banner-link">Registrar movimentação <span>→</span></a></div>
+      <div class="banner-art" aria-hidden="true"><div class="art-circle circle-one"></div><div class="art-circle circle-two"></div><div class="art-card"><span>SEU PLANEJAMENTO</span><strong>+ clareza</strong><div class="art-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><small>um futuro mais organizado</small></div><div class="art-coin">R$</div></div>
     </section>
 
-    <section class="resumos">
-      <article class="cartao">
-        <p>Saldo disponível</p>
-        <h2 id="saldo">R$ 0,00</h2>
-      </article>
-      <article class="cartao">
-        <p>Receitas</p>
-        <h2 id="receitas" class="verde">R$ 0,00</h2>
-      </article>
-      <article class="cartao">
-        <p>Despesas</p>
-        <h2 id="despesas" class="vermelho">R$ 0,00</h2>
-      </article>
+    <section class="summary-grid">
+      <article class="summary-card"><div class="summary-top"><span>Saldo disponível</span><span class="metric-icon purple">↗</span></div><strong class="metric-value" id="balanceValue">R$ 0,00</strong><div class="metric-foot"><span class="dot purple-dot"></span> Receitas menos despesas</div></article>
+      <article class="summary-card"><div class="summary-top"><span>Total de receitas</span><span class="metric-icon green">＋</span></div><strong class="metric-value green-text" id="incomeValue">R$ 0,00</strong><div class="metric-foot"><span class="dot green-dot"></span> Entradas registradas</div></article>
+      <article class="summary-card"><div class="summary-top"><span>Total de despesas</span><span class="metric-icon coral">−</span></div><strong class="metric-value coral-text" id="expenseValue">R$ 0,00</strong><div class="metric-foot"><span class="dot coral-dot"></span> Saídas registradas</div></article>
+      <article class="summary-card"><div class="summary-top"><span>Metas concluídas</span><span class="metric-icon yellow">★</span></div><strong class="metric-value" id="goalsValue">0 <small>/ 0</small></strong><div class="metric-foot"><span class="dot yellow-dot"></span> Continue avançando</div></article>
     </section>
 
-    <section class="layout">
-      <article class="cartao" id="movimentacoes">
-        <h2>Movimentações</h2>
-        <p class="descricao">Registre suas entradas e despesas.</p>
-
-        <form id="formMovimentacao">
-          <label for="descricao">Descrição</label>
-          <input id="descricao" type="text" placeholder="Ex.: lanche, mesada..." required>
-
-          <label for="valor">Valor (R$)</label>
-          <input id="valor" type="number" min="0.01" step="0.01" placeholder="0,00" required>
-
-          <label for="tipo">Tipo de movimentação</label>
-          <select id="tipo">
-            <option value="despesa">Despesa</option>
-            <option value="receita">Receita</option>
-          </select>
-
-          <label for="categoria">Categoria</label>
-          <select id="categoria">
-            <option>Alimentação</option>
-            <option>Transporte</option>
-            <option>Estudos</option>
-            <option>Lazer</option>
-            <option>Casa</option>
-            <option>Mesada</option>
-            <option>Outros</option>
-          </select>
-
-          <button class="botao principal" type="submit">+ Adicionar movimentação</button>
+    <section class="dashboard-grid">
+      <article class="panel transactions-panel" id="movimentacoes">
+        <div class="panel-heading"><div><p class="eyebrow">ACOMPANHAMENTO</p><h2>Movimentações recentes</h2><p class="muted">Veja e gerencie suas entradas e saídas.</p></div><button id="exportButton" class="button button-light" type="button">Exportar CSV ↗</button></div>
+        <form id="transactionForm" class="transaction-form">
+          <div class="field"><label for="description">Descrição</label><input id="description" type="text" maxlength="60" placeholder="Ex.: lanche, mesada..." required></div>
+          <div class="field"><label for="amount">Valor (R$)</label><input id="amount" type="number" min="0.01" step="0.01" placeholder="0,00" required></div>
+          <div class="field"><label for="type">Tipo</label><select id="type"><option value="expense">Despesa</option><option value="income">Receita</option></select></div>
+          <div class="field"><label for="category">Categoria</label><select id="category"><option>Alimentação</option><option>Transporte</option><option>Estudos</option><option>Lazer</option><option>Casa</option><option>Mesada</option><option>Saúde</option><option>Outros</option></select></div>
+          <button class="button button-primary add-button" type="submit">＋ Adicionar movimentação</button>
         </form>
-
-        <div class="titulo-lista">
-          <h3>Histórico</h3>
-          <button id="exportar" class="botao secundario" type="button">Exportar CSV</button>
-        </div>
-        <div id="listaMovimentacoes">
-          <p class="vazio">Suas movimentações aparecerão aqui.</p>
-        </div>
+        <div class="list-toolbar"><h3>Histórico</h3><div class="filter-wrap"><label for="filterType">Filtrar:</label><select id="filterType"><option value="all">Todas</option><option value="income">Receitas</option><option value="expense">Despesas</option></select></div></div>
+        <div id="transactionList" class="transaction-list"><p class="empty-state">Nenhuma movimentação ainda. Adicione a primeira acima.</p></div>
       </article>
 
-      <div class="coluna-lateral">
-        <article class="cartao">
-          <h2>Limite de gastos</h2>
-          <p class="descricao">Defina seu orçamento mensal.</p>
-          <form id="formOrcamento">
-            <label for="orcamento">Orçamento (R$)</label>
-            <input id="orcamento" type="number" min="0.01" step="0.01" placeholder="Ex.: 500" required>
-            <button class="botao principal" type="submit">Definir limite</button>
-          </form>
-          <div class="barra"><div id="progresso"></div></div>
-          <p id="mensagemOrcamento" class="descricao">Defina seu limite para começar.</p>
+      <div class="right-column">
+        <article class="panel budget-panel" id="orcamento">
+          <div class="panel-heading compact"><div><p class="eyebrow">CONTROLE DE GASTOS</p><h2>Meu orçamento</h2></div><span class="metric-icon purple">◉</span></div>
+          <p class="muted">Defina um limite e acompanhe quanto já utilizou.</p>
+          <form id="budgetForm" class="budget-form"><div class="field"><label for="budgetLimit">Limite mensal (R$)</label><input id="budgetLimit" type="number" min="0.01" step="0.01" placeholder="Ex.: 500" required></div><button class="button button-primary" type="submit">Salvar limite</button></form>
+          <div class="budget-numbers"><span id="budgetSpent">R$ 0,00 gastos</span><strong id="budgetPercent">0%</strong></div>
+          <div class="progress-track"><div id="budgetProgress" class="progress-fill"></div></div>
+          <p id="budgetMessage" class="budget-message">Defina um limite para acompanhar seu orçamento.</p>
         </article>
 
-        <article class="cartao">
-          <h2>Regra 50–30–20</h2>
-          <p class="descricao">Uma forma simples de planejar sua renda.</p>
-          <label for="renda">Renda mensal (R$)</label>
-          <input id="renda" type="number" min="0" step="0.01" placeholder="Ex.: 1200">
-          <button id="calcular" class="botao secundario" type="button">Calcular divisão</button>
-          <div class="regra"><span>Necessidades · 50%</span><strong id="necessidades">R$ 0,00</strong></div>
-          <div class="regra"><span>Desejos · 30%</span><strong id="desejos">R$ 0,00</strong></div>
-          <div class="regra"><span>Economia · 20%</span><strong id="economia">R$ 0,00</strong></div>
-        </article>
-
-        <article class="cartao" id="metas">
-          <h2>Minha meta</h2>
-          <p class="descricao">Planeje sua próxima conquista.</p>
-          <form id="formMeta">
-            <label for="nomeMeta">Nome da meta</label>
-            <input id="nomeMeta" type="text" placeholder="Ex.: comprar um livro" required>
-            <label for="valorMeta">Valor desejado (R$)</label>
-            <input id="valorMeta" type="number" min="0.01" step="0.01" required>
-            <label for="guardado">Quanto já guardou (R$)</label>
-            <input id="guardado" type="number" min="0" step="0.01" value="0" required>
-            <button class="botao principal" type="submit">Criar meta</button>
-          </form>
-          <div id="listaMetas"></div>
+        <article class="panel rule-panel">
+          <div class="panel-heading compact"><div><p class="eyebrow">DICA DE PLANEJAMENTO</p><h2>Regra 50–30–20</h2></div><span class="metric-icon green">✦</span></div>
+          <p class="muted">Uma referência para distribuir sua renda mensal.</p>
+          <div class="field"><label for="monthlyIncome">Sua renda planejada (R$)</label><input id="monthlyIncome" type="number" min="0" step="0.01" placeholder="Ex.: 1200"></div>
+          <button id="calculateRule" class="button button-light full-button" type="button">Calcular divisão</button>
+          <div class="rule-row"><span class="rule-label"><i class="rule-dot needs"></i>Necessidades <small>50%</small></span><strong id="needsValue">R$ 0,00</strong></div>
+          <div class="rule-row"><span class="rule-label"><i class="rule-dot wants"></i>Desejos <small>30%</small></span><strong id="wantsValue">R$ 0,00</strong></div>
+          <div class="rule-row"><span class="rule-label"><i class="rule-dot savings"></i>Economia <small>20%</small></span><strong id="savingsValue">R$ 0,00</strong></div>
         </article>
       </div>
     </section>
 
-    <section class="dica">
-      <span>💡</span>
-      <div>
-        <strong>Uma dica do FinEdu</strong>
-        <p>Registrar até os pequenos gastos ajuda você a entender seus hábitos e tomar decisões melhores.</p>
-      </div>
+    <section class="lower-grid">
+      <article class="panel goals-panel" id="metas">
+        <div class="panel-heading"><div><p class="eyebrow">SEUS OBJETIVOS</p><h2>Metas de economia</h2><p class="muted">Transforme planos em pequenas conquistas.</p></div><span class="metric-icon yellow">★</span></div>
+        <form id="goalForm" class="goal-form">
+          <div class="field"><label for="goalName">Nome da meta</label><input id="goalName" type="text" maxlength="45" placeholder="Ex.: comprar um livro" required></div>
+          <div class="field"><label for="goalTarget">Valor desejado (R$)</label><input id="goalTarget" type="number" min="0.01" step="0.01" placeholder="300" required></div>
+          <div class="field"><label for="goalSaved">Já guardado (R$)</label><input id="goalSaved" type="number" min="0" step="0.01" value="0" required></div>
+          <button class="button button-primary goal-create" type="submit">＋ Criar meta</button>
+        </form>
+        <div id="goalList" class="goal-list"><p class="empty-state">Sua próxima conquista começa com uma meta.</p></div>
+      </article>
+
+      <article class="panel challenge-panel" id="desafio">
+        <div class="challenge-heading"><div><p class="eyebrow">HÁBITOS SAUDÁVEIS</p><h2>Desafio de 7 dias</h2></div><span class="challenge-star">✦</span></div>
+        <p class="muted">Pequenas ações para conhecer melhor seu dinheiro.</p>
+        <div class="challenge-progress-row"><strong id="challengeCount">0 de 7 concluídos</strong><span id="challengePercent">0%</span></div>
+        <div class="progress-track"><div id="challengeProgress" class="progress-fill green-fill"></div></div>
+        <div id="challengeList" class="challenge-list"></div>
+        <button id="resetChallenge" class="button button-light full-button" type="button">Reiniciar desafio</button>
+      </article>
     </section>
 
-    <p class="aviso">FinEdu é um projeto educativo demonstrativo. Não está conectado a bancos. Os dados ficam salvos no navegador utilizado.</p>
+    <section class="tip-banner"><div class="tip-symbol">✦</div><div><strong>Seu dinheiro merece um plano.</strong><p>Reserve alguns minutos por semana para revisar seus gastos e celebrar seus avanços.</p></div></section>
+    <p class="disclaimer">FinEdu é um projeto educativo demonstrativo. Não está conectado a bancos. Os dados ficam salvos apenas neste navegador; não insira senhas ou informações bancárias reais.</p>
+    <footer><span>© <span id="year"></span> FinEdu</span><span>Educação financeira de um jeito simples.</span></footer>
   </main>
-
-  <footer>© 2026 FinEdu · Educação financeira de um jeito simples.</footer>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 </body>
 </html>

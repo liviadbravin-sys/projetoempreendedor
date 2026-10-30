@@ -3,108 +3,165 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="FinEdu: organize suas finanças, planeje gastos e acompanhe suas metas.">
-  <title>FinEdu — Controle financeiro inteligente</title>
+  <meta name="description" content="FinEdu — plataforma de organização e educação financeira.">
+  <title>FinEdu | Seu dinheiro, suas escolhas</title>
   <link rel="stylesheet" href="style.css">
-  <script src="script.js" defer></script>
 </head>
 <body>
+<div class="app">
   <aside class="sidebar">
-    <a class="brand" href="#inicio"><span class="brand-mark">F</span><span>FinEdu</span></a>
-    <p class="nav-label">MENU PRINCIPAL</p>
-    <nav>
-      <a class="nav-link active" href="#inicio"><span>▦</span> Visão geral</a>
-      <a class="nav-link" href="#movimentacoes"><span>↕</span> Movimentações</a>
-      <a class="nav-link" href="#orcamento"><span>◉</span> Orçamento</a>
-      <a class="nav-link" href="#metas"><span>◎</span> Minhas metas</a>
-      <a class="nav-link" href="#desafio"><span>✦</span> Desafio da semana</a>
+    <div class="brand">
+      <div class="brand-icon">F</div>
+      <div><strong>FinEdu</strong><small>Educação financeira</small></div>
+    </div>
+    <nav class="nav" aria-label="Navegação principal">
+      <button class="nav-item active" data-page="inicio">⌂ <span>Início</span></button>
+      <button class="nav-item" data-page="movimentacoes">↕ <span>Movimentações</span></button>
+      <button class="nav-item" data-page="metas">◎ <span>Minhas metas</span></button>
+      <button class="nav-item" data-page="relatorios">▥ <span>Relatórios</span></button>
+      <button class="nav-item" data-page="educacao">▤ <span>Educação financeira</span></button>
     </nav>
-    <div class="sidebar-bottom">
-      <div class="help-card"><span class="help-icon">✦</span><strong>Um passo de cada vez</strong><p>Pequenos hábitos ajudam a construir uma vida financeira mais tranquila.</p></div>
-      <button id="themeToggle" class="theme-button" type="button"><span id="themeIcon">☾</span> Alternar tema</button>
+    <div class="sidebar-spacer"></div>
+    <div class="premium-card">
+      <span class="premium-badge">FINEDU PREMIUM</span>
+      <h3>Mais controle para suas metas.</h3>
+      <p>Relatórios, metas ilimitadas, planejamento e recursos avançados.</p>
+      <button class="premium-btn" id="premiumBtn">Conhecer Premium</button>
+    </div>
+    <button class="nav-item settings-btn" id="settingsBtn">⚙ <span>Configurações</span></button>
+    <div class="profile-mini">
+      <div class="avatar">L</div>
+      <div><strong>Lívia</strong><small>Conta demonstrativa</small></div>
     </div>
   </aside>
 
-  <main class="main" id="inicio">
+  <main class="content">
     <header class="topbar">
-      <div><p class="eyebrow">SEU ESPAÇO FINANCEIRO</p><h1>Visão geral</h1></div>
-      <div class="topbar-right"><span class="date-pill" id="todayLabel"></span><div class="avatar">F</div></div>
+      <div>
+        <p class="eyebrow">CONTA DEMONSTRATIVA</p>
+        <h1 id="pageTitle">Olá, Lívia! 👋</h1>
+        <p id="pageSubtitle" class="subtitle">Veja como está sua vida financeira hoje.</p>
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn" id="notificationBtn" aria-label="Notificações">🔔<span class="notification-dot"></span></button>
+        <button class="profile-top" id="profileBtn"><span class="avatar small">L</span><span>Lívia</span>⌄</button>
+      </div>
     </header>
 
-    <section class="welcome-banner">
-      <div><p class="welcome-kicker">BEM-VINDA(O) AO FINEDU</p><h2>Organize hoje.<br><span>Realize amanhã.</span></h2><p>Acompanhe seu dinheiro e mantenha seus objetivos no caminho certo.</p><a href="#movimentacoes" class="banner-link">Registrar movimentação <span>→</span></a></div>
-      <div class="banner-art" aria-hidden="true"><div class="art-circle circle-one"></div><div class="art-circle circle-two"></div><div class="art-card"><span>SEU PLANEJAMENTO</span><strong>+ clareza</strong><div class="art-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><small>um futuro mais organizado</small></div><div class="art-coin">R$</div></div>
+    <section id="inicio" class="page active-page">
+      <div class="balance-grid">
+        <div class="balance-card main-balance">
+          <div class="card-head"><span>Saldo disponível</span><button class="eye" id="eyeBtn" aria-label="Ocultar saldo">◉</button></div>
+          <div class="balance" id="balanceValue">R$ 850,00</div>
+          <div class="balance-foot"><span class="balance-change">↑ 8,4%</span> em relação ao mês passado</div>
+        </div>
+        <div class="stat-card"><span>Entradas</span><strong id="incomeValue">R$ 1.200,00</strong><small class="positive">↑ este mês</small></div>
+        <div class="stat-card"><span>Gastos</span><strong id="expenseValue">R$ 350,00</strong><small class="negative">↑ este mês</small></div>
+      </div>
+
+      <div class="quick-actions">
+        <button class="quick-btn" data-modal="income"><span>＋</span> Adicionar entrada</button>
+        <button class="quick-btn" data-modal="expense"><span>−</span> Adicionar gasto</button>
+        <button class="quick-btn" data-modal="goal"><span>◎</span> Nova meta</button>
+      </div>
+
+      <div class="two-col">
+        <section class="panel">
+          <div class="panel-title"><div><h2>Gastos por categoria</h2><p>Distribuição dos seus gastos</p></div><button class="link-btn" data-page-link="relatorios">Ver relatório →</button></div>
+          <div class="category-chart">
+            <div class="donut" id="donut"><div><strong id="donutTotal">R$ 350</strong><span>total</span></div></div>
+            <div class="legend" id="categoryLegend"></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title"><div><h2>Minha meta principal</h2><p>Seu próximo objetivo</p></div><button class="link-btn" data-page-link="metas">Ver metas →</button></div>
+          <div id="mainGoal"></div>
+        </section>
+      </div>
+
+      <section class="panel">
+        <div class="panel-title"><div><h2>Últimas movimentações</h2><p>Seus lançamentos recentes</p></div><button class="link-btn" data-page-link="movimentacoes">Ver todas →</button></div>
+        <div id="recentTransactions" class="transactions"></div>
+      </section>
+
+      <section class="tip-banner">
+        <div class="tip-icon">💡</div>
+        <div><strong>Dica do FinEdu</strong><p id="dailyTip">Pequenos gastos também fazem diferença. Registrar tudo ajuda você a enxergar seus hábitos.</p></div>
+        <button class="tip-next" id="nextTip">Outra dica →</button>
+      </section>
     </section>
 
-    <section class="summary-grid">
-      <article class="summary-card"><div class="summary-top"><span>Saldo disponível</span><span class="metric-icon purple">↗</span></div><strong class="metric-value" id="balanceValue">R$ 0,00</strong><div class="metric-foot"><span class="dot purple-dot"></span> Receitas menos despesas</div></article>
-      <article class="summary-card"><div class="summary-top"><span>Total de receitas</span><span class="metric-icon green">＋</span></div><strong class="metric-value green-text" id="incomeValue">R$ 0,00</strong><div class="metric-foot"><span class="dot green-dot"></span> Entradas registradas</div></article>
-      <article class="summary-card"><div class="summary-top"><span>Total de despesas</span><span class="metric-icon coral">−</span></div><strong class="metric-value coral-text" id="expenseValue">R$ 0,00</strong><div class="metric-foot"><span class="dot coral-dot"></span> Saídas registradas</div></article>
-      <article class="summary-card"><div class="summary-top"><span>Metas concluídas</span><span class="metric-icon yellow">★</span></div><strong class="metric-value" id="goalsValue">0 <small>/ 0</small></strong><div class="metric-foot"><span class="dot yellow-dot"></span> Continue avançando</div></article>
+    <section id="movimentacoes" class="page">
+      <div class="section-heading"><div><h2>Movimentações</h2><p>Controle suas entradas e gastos.</p></div><button class="primary" data-modal="expense">＋ Nova movimentação</button></div>
+      <section class="panel">
+        <div class="filter-row">
+          <input id="searchTx" type="search" placeholder="🔎 Buscar movimentação..." aria-label="Buscar movimentação">
+          <select id="typeFilter" aria-label="Filtrar por tipo"><option value="all">Todos</option><option value="income">Entradas</option><option value="expense">Gastos</option></select>
+        </div>
+        <div id="allTransactions" class="transactions"></div>
+      </section>
     </section>
 
-    <section class="dashboard-grid">
-      <article class="panel transactions-panel" id="movimentacoes">
-        <div class="panel-heading"><div><p class="eyebrow">ACOMPANHAMENTO</p><h2>Movimentações recentes</h2><p class="muted">Veja e gerencie suas entradas e saídas.</p></div><button id="exportButton" class="button button-light" type="button">Exportar CSV ↗</button></div>
-        <form id="transactionForm" class="transaction-form">
-          <div class="field"><label for="description">Descrição</label><input id="description" type="text" maxlength="60" placeholder="Ex.: lanche, mesada..." required></div>
-          <div class="field"><label for="amount">Valor (R$)</label><input id="amount" type="number" min="0.01" step="0.01" placeholder="0,00" required></div>
-          <div class="field"><label for="type">Tipo</label><select id="type"><option value="expense">Despesa</option><option value="income">Receita</option></select></div>
-          <div class="field"><label for="category">Categoria</label><select id="category"><option>Alimentação</option><option>Transporte</option><option>Estudos</option><option>Lazer</option><option>Casa</option><option>Mesada</option><option>Saúde</option><option>Outros</option></select></div>
-          <button class="button button-primary add-button" type="submit">＋ Adicionar movimentação</button>
-        </form>
-        <div class="list-toolbar"><h3>Histórico</h3><div class="filter-wrap"><label for="filterType">Filtrar:</label><select id="filterType"><option value="all">Todas</option><option value="income">Receitas</option><option value="expense">Despesas</option></select></div></div>
-        <div id="transactionList" class="transaction-list"><p class="empty-state">Nenhuma movimentação ainda. Adicione a primeira acima.</p></div>
-      </article>
+    <section id="metas" class="page">
+      <div class="section-heading"><div><h2>Minhas metas</h2><p>Transforme planos em objetivos.</p></div><button class="primary" data-modal="goal">＋ Criar meta</button></div>
+      <div id="goalGrid" class="goal-grid"></div>
+    </section>
 
-      <div class="right-column">
-        <article class="panel budget-panel" id="orcamento">
-          <div class="panel-heading compact"><div><p class="eyebrow">CONTROLE DE GASTOS</p><h2>Meu orçamento</h2></div><span class="metric-icon purple">◉</span></div>
-          <p class="muted">Defina um limite e acompanhe quanto já utilizou.</p>
-          <form id="budgetForm" class="budget-form"><div class="field"><label for="budgetLimit">Limite mensal (R$)</label><input id="budgetLimit" type="number" min="0.01" step="0.01" placeholder="Ex.: 500" required></div><button class="button button-primary" type="submit">Salvar limite</button></form>
-          <div class="budget-numbers"><span id="budgetSpent">R$ 0,00 gastos</span><strong id="budgetPercent">0%</strong></div>
-          <div class="progress-track"><div id="budgetProgress" class="progress-fill"></div></div>
-          <p id="budgetMessage" class="budget-message">Defina um limite para acompanhar seu orçamento.</p>
-        </article>
+    <section id="relatorios" class="page">
+      <div class="section-heading"><div><h2>Relatórios</h2><p>Entenda seus hábitos financeiros.</p></div><select class="period-select" id="periodSelect"><option>Este mês</option><option>Últimos 3 meses</option></select></div>
+      <div class="report-grid">
+        <section class="panel">
+          <span class="report-label">RESUMO DO MÊS</span>
+          <div class="report-numbers"><div><small>Entradas</small><strong id="reportIncome">R$ 1.200,00</strong></div><div><small>Gastos</small><strong id="reportExpense">R$ 350,00</strong></div></div>
+          <div class="bar-chart" id="barChart" aria-label="Gráfico de gastos"></div>
+          <div class="chart-labels"><span>Alim.</span><span>Transp.</span><span>Lazer</span><span>Compras</span><span>Estudos</span><span>Outros</span></div>
+        </section>
+        <section class="panel insight"><span class="report-label">INSIGHT DO FINEDU</span><div class="insight-icon">📊</div><h3 id="insightTitle">Você está acompanhando seus gastos.</h3><p id="insightText">Ao registrar suas despesas, você consegue identificar padrões e tomar decisões com mais informação.</p></section>
+      </div>
+      <section class="panel report-table-panel"><div class="panel-title"><div><h2>Resumo por categoria</h2><p>Quanto cada categoria representa</p></div></div><div id="reportCategories" class="report-categories"></div></section>
+    </section>
 
-        <article class="panel rule-panel">
-          <div class="panel-heading compact"><div><p class="eyebrow">DICA DE PLANEJAMENTO</p><h2>Regra 50–30–20</h2></div><span class="metric-icon green">✦</span></div>
-          <p class="muted">Uma referência para distribuir sua renda mensal.</p>
-          <div class="field"><label for="monthlyIncome">Sua renda planejada (R$)</label><input id="monthlyIncome" type="number" min="0" step="0.01" placeholder="Ex.: 1200"></div>
-          <button id="calculateRule" class="button button-light full-button" type="button">Calcular divisão</button>
-          <div class="rule-row"><span class="rule-label"><i class="rule-dot needs"></i>Necessidades <small>50%</small></span><strong id="needsValue">R$ 0,00</strong></div>
-          <div class="rule-row"><span class="rule-label"><i class="rule-dot wants"></i>Desejos <small>30%</small></span><strong id="wantsValue">R$ 0,00</strong></div>
-          <div class="rule-row"><span class="rule-label"><i class="rule-dot savings"></i>Economia <small>20%</small></span><strong id="savingsValue">R$ 0,00</strong></div>
-        </article>
+    <section id="educacao" class="page">
+      <div class="section-heading"><div><h2>Educação financeira</h2><p>Aprenda conceitos para cuidar melhor do seu dinheiro.</p></div></div>
+      <div class="learn-grid">
+        <article class="learn-card"><span>📊</span><h3>Orçamento pessoal</h3><p>Organize suas entradas e despesas e defina limites para cada categoria.</p><button data-lesson="orcamento">Ler conteúdo →</button></article>
+        <article class="learn-card"><span>🎯</span><h3>Como criar uma meta</h3><p>Defina um objetivo, um valor e um prazo para acompanhar seu progresso.</p><button data-lesson="metas">Ler conteúdo →</button></article>
+        <article class="learn-card"><span>🛡️</span><h3>Segurança financeira</h3><p>Conheça cuidados básicos para proteger seus dados e reconhecer situações suspeitas.</p><button data-lesson="seguranca">Ler conteúdo →</button></article>
+        <article class="learn-card"><span>💳</span><h3>Cartão e crédito</h3><p>Entenda a diferença entre comprar e assumir um compromisso de pagamento.</p><button data-lesson="credito">Ler conteúdo →</button></article>
       </div>
     </section>
-
-    <section class="lower-grid">
-      <article class="panel goals-panel" id="metas">
-        <div class="panel-heading"><div><p class="eyebrow">SEUS OBJETIVOS</p><h2>Metas de economia</h2><p class="muted">Transforme planos em pequenas conquistas.</p></div><span class="metric-icon yellow">★</span></div>
-        <form id="goalForm" class="goal-form">
-          <div class="field"><label for="goalName">Nome da meta</label><input id="goalName" type="text" maxlength="45" placeholder="Ex.: comprar um livro" required></div>
-          <div class="field"><label for="goalTarget">Valor desejado (R$)</label><input id="goalTarget" type="number" min="0.01" step="0.01" placeholder="300" required></div>
-          <div class="field"><label for="goalSaved">Já guardado (R$)</label><input id="goalSaved" type="number" min="0" step="0.01" value="0" required></div>
-          <button class="button button-primary goal-create" type="submit">＋ Criar meta</button>
-        </form>
-        <div id="goalList" class="goal-list"><p class="empty-state">Sua próxima conquista começa com uma meta.</p></div>
-      </article>
-
-      <article class="panel challenge-panel" id="desafio">
-        <div class="challenge-heading"><div><p class="eyebrow">HÁBITOS SAUDÁVEIS</p><h2>Desafio de 7 dias</h2></div><span class="challenge-star">✦</span></div>
-        <p class="muted">Pequenas ações para conhecer melhor seu dinheiro.</p>
-        <div class="challenge-progress-row"><strong id="challengeCount">0 de 7 concluídos</strong><span id="challengePercent">0%</span></div>
-        <div class="progress-track"><div id="challengeProgress" class="progress-fill green-fill"></div></div>
-        <div id="challengeList" class="challenge-list"></div>
-        <button id="resetChallenge" class="button button-light full-button" type="button">Reiniciar desafio</button>
-      </article>
-    </section>
-
-    <section class="tip-banner"><div class="tip-symbol">✦</div><div><strong>Seu dinheiro merece um plano.</strong><p>Reserve alguns minutos por semana para revisar seus gastos e celebrar seus avanços.</p></div></section>
-    <p class="disclaimer">FinEdu é um projeto educativo demonstrativo. Não está conectado a bancos. Os dados ficam salvos apenas neste navegador; não insira senhas ou informações bancárias reais.</p>
-    <footer><span>© <span id="year"></span> FinEdu</span><span>Educação financeira de um jeito simples.</span></footer>
   </main>
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</div>
+
+<div class="modal-overlay" id="modal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="close" id="closeModal" aria-label="Fechar">×</button>
+    <h2 id="modalTitle">Adicionar gasto</h2>
+    <p id="modalSubtitle">Registre uma movimentação na sua conta demonstrativa.</p>
+    <form id="modalForm">
+      <label>Descrição<input id="modalDesc" required maxlength="50" type="text" placeholder="Ex.: Lanche"></label>
+      <label>Valor (R$)<input id="modalValue" required min="0.01" step="0.01" type="number" placeholder="0,00"></label>
+      <label id="categoryLabel">Categoria<select id="modalCategory"><option value="Alimentação">Alimentação</option><option value="Transporte">Transporte</option><option value="Lazer">Lazer</option><option value="Compras">Compras</option><option value="Estudos">Estudos</option><option value="Outros">Outros</option></select></label>
+      <label id="goalTargetLabel" class="hidden">Valor da meta (R$)<input id="goalTarget" min="1" step="0.01" type="number" placeholder="2000"></label>
+      <button class="primary full" type="submit" id="saveModal">Salvar</button>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="lessonModal" aria-hidden="true">
+  <div class="modal lesson-modal"><button class="close" id="closeLesson" aria-label="Fechar">×</button><div id="lessonContent"></div></div>
+</div>
+
+<div class="modal-overlay" id="premiumModal" aria-hidden="true">
+  <div class="modal premium-modal"><button class="close" id="closePremium" aria-label="Fechar">×</button><span class="premium-badge">FINEDU PREMIUM</span><h2>Mais recursos para cuidar do seu dinheiro.</h2><div class="price">R$ 19,90 <small>/mês</small></div><p>Ou <strong>R$ 199,90/ano</strong>. Na proposta do projeto, o plano pago sustenta a manutenção e evolução da plataforma.</p><ul><li>✓ Relatórios completos</li><li>✓ Metas ilimitadas</li><li>✓ Planejamento mensal</li><li>✓ Simuladores e conteúdos extras</li></ul><button class="primary full" id="premiumCloseAction">Entendi</button></div>
+</div>
+
+<div class="modal-overlay" id="profileModal" aria-hidden="true">
+  <div class="modal"><button class="close" id="closeProfile" aria-label="Fechar">×</button><h2>Conta demonstrativa</h2><p>Esta versão do FinEdu usa dados fictícios para a apresentação da Feira Empreendedora.</p><div class="profile-box"><div class="avatar large">L</div><div><strong>Lívia</strong><span>Plano gratuito • Demonstração</span></div></div><button class="secondary full" id="resetData">Restaurar dados de demonstração</button></div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="script.js"></script>
 </body>
 </html>
